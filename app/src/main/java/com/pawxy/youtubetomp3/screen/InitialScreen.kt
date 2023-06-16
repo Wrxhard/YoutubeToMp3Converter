@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.DocumentsContract
-import android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -37,7 +36,6 @@ import org.json.JSONObject
 class InitialScreen : AppCompatActivity() {
     private lateinit var binding: InitialscreenBinding
     private lateinit var activityLauncher: ActivityResultLauncher<Intent>
-    private lateinit var storagePermissionResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var mViewModel: SimpleViewModel
 
 
@@ -68,15 +66,6 @@ class InitialScreen : AppCompatActivity() {
                 }
             }
         }
-
-        //register activity to ask for manage storage permission
-        storagePermissionResultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) {
-            if (Environment.isExternalStorageManager()) {
-                Toast.makeText(this,"Permission Granted",Toast.LENGTH_SHORT).show()
-            }
-        }
         //Check event state
         checkState()
         //Default directory is Download
@@ -91,26 +80,36 @@ class InitialScreen : AppCompatActivity() {
             try {
                 if (videoUrl!="")
                 {
+                    lifecycleScope.launch(Dispatchers.IO)
+                    {
+                        repeatOnLifecycle(Lifecycle.State.CREATED)
+                        {
+                            //Call get_video function from python (yt-dlp)
+                            val raw = youtubeHelper.callAttr("get_video_info", videoUrl)
+                            val jsonObject=JSONObject(raw.toString())
+                            //Grab the first url that store video
+                            val videoOverview=filerJson(jsonObject).copy()
+                            //Remove all special character,emoji,icon and non english alphabet
+                            val title = stringHelper.callAttr("remove_special_characters",videoOverview.title).toString()
+                            withContext(Dispatchers.Main)
+                            {
+                                val intent = Intent(this@InitialScreen,DownloadScreen::class.java).apply {
+                                    videoOverview.let {
+                                        putExtra("title",title)
+                                        putExtra("thumbnail",videoOverview.thumbnail)
+                                        putExtra("stream_link",videoOverview.streamLink)
+                                        putExtra("view_count",videoOverview.view)
+                                        putExtra("like_count",videoOverview.like)
+                                        putExtra("directory",binding.LinkToFolder.text.toString())
+                                    }
 
-                    //Call get_video function from python (yt-dlp)
-                    val raw = youtubeHelper.callAttr("get_video_info", videoUrl)
-                    val jsonObject=JSONObject(raw.toString())
-                    //Grab the first url that store video
-                    val videoOverview=filerJson(jsonObject).copy()
-                    //Remove all special character,emoji,icon and non english alphabet
-                    val title = stringHelper.callAttr("remove_special_characters",videoOverview.title).toString()
-                    val intent = Intent(this@InitialScreen,DownloadScreen::class.java).apply {
-                        videoOverview.let {
-                            putExtra("title",title)
-                            putExtra("thumbnail",videoOverview.thumbnail)
-                            putExtra("stream_link",videoOverview.streamLink)
-                            putExtra("view_count",videoOverview.view)
-                            putExtra("like_count",videoOverview.like)
-                            putExtra("directory",binding.LinkToFolder.text.toString())
+                                }
+                                startActivity(intent)
+                            }
                         }
-
                     }
-                    startActivity(intent)
+
+
                 }else{
                     mViewModel.restart()
                     Toast.makeText(this@InitialScreen,"Please Provide A Link To Video",Toast.LENGTH_SHORT).show()
@@ -122,12 +121,7 @@ class InitialScreen : AppCompatActivity() {
 
         }
         binding.LinkToFolder.setOnClickListener {
-            if (Environment.isExternalStorageManager())
-            {
-                openFilePicker()
-            }else{
-                askPermission()
-            }
+            openFilePicker()
         }
     }
 
@@ -136,17 +130,6 @@ class InitialScreen : AppCompatActivity() {
         enableUserInput()
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun askPermission()
-    {
-        val intent = Intent(
-            ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-            Uri.parse( "package:${applicationContext.packageName}")
-        )
-        storagePermissionResultLauncher.launch(intent)
-
-
-    }
     private fun openFilePicker()
     {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
@@ -235,6 +218,7 @@ class InitialScreen : AppCompatActivity() {
             val streamLink=formats.getJSONObject(i).getString("url")
             if(streamLink.contains("googlevideo"))
             {
+                Log.i("steam",streamLink.takeLast(10))
                 return VideoOverview(title,thumbnail,streamLink,view, like)
             }
         }

@@ -1,30 +1,40 @@
 package com.pawxy.youtubetomp3.network
+
 import com.pawxy.youtubetomp3.model.Video
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okhttp3.ResponseBody
+import okhttp3.*
 import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 object NetworkHelper {
 
-    //perform Okhttp request
-    fun doNetworkCall(fileUrl: String): Video? {
+    // Perform OkHttp request
+    suspend fun doNetworkCall(
+        fileUrl: String
+    ): Video? = suspendCoroutine { continuation ->
         val client = OkHttpClient()
         val request = Request.Builder()
             .url(fileUrl)
             .build()
 
-        val response: Response = client.newCall(request).execute()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                if (!response.isSuccessful) {
+                    continuation.resumeWithException(IOException("Failed to download file: $response"))
+                    return
+                }
 
-        if (!response.isSuccessful) {
-            throw IOException("Failed to download file: $response")
-        }
+                val responseBody: ResponseBody? = response.body
+                responseBody?.let {
+                    val video = Video(it.byteStream(), it.contentLength())
+                    continuation.resume(video)
+                } ?: continuation.resume(null)
+            }
 
-        val responseBody: ResponseBody? = response.body
-        responseBody?.let {
-            return Video(it.byteStream(),it.contentLength())
-        }
-        return null
+            override fun onFailure(call: Call, e: IOException) {
+                continuation.resumeWithException(e)
+            }
+        })
     }
 }

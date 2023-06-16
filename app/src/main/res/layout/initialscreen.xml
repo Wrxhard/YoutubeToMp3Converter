@@ -107,13 +107,12 @@
 
         app:layout_constraintTop_toBottomOf="@id/StoreDirectory"
         app:layout_constraintStart_toStartOf="@id/YoutubeLogo"
-        android:drawableLeft="@drawable/informationicon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         android:layout_marginTop="@dimen/_10sdp"
         android:text=" Where you want to save the MP3"
-        />
+        app:drawableLeftCompat="@drawable/informationicon" />
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="@dimen/_50sdp"
@@ -121,14 +120,20 @@
         android:layout_marginTop="@dimen/_20sdp"
         android:layout_marginEnd="@dimen/_15sdp"
         app:layout_constraintTop_toBottomOf="@id/store_description"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+
+        android:background="@drawable/bg_btn"
+        app:cardCornerRadius="@dimen/_8sdp"
+
         >
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/DownloadButton"
-            android:background="@drawable/bg_btn"
+
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            >
             <ProgressBar
                 android:id="@+id/progress_bar"
                 android:indeterminate="true"
@@ -160,12 +165,8 @@
                 android:textStyle="bold"
                 android:textSize="@dimen/_14ssp"
                 />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

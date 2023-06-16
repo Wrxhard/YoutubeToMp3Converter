@@ -1,12 +1,8 @@
 package com.pawxy.youtubetomp3.screen
 
-import android.content.res.ColorStateList
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
@@ -14,12 +10,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.pawxy.youtubetomp3.R
 import com.pawxy.youtubetomp3.viewModel.SimpleViewModel
 import com.pawxy.youtubetomp3.databinding.DownloadscreenBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,8 +47,8 @@ class DownloadScreen : AppCompatActivity() {
                 .into(binding.imageView)
 
             binding.title.text = title
-            binding.likeCount.text = likeCount
-            binding.viewCount.text = viewCount
+            binding.likeCount.text = " $likeCount"
+            binding.viewCount.text = " $viewCount"
             binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_download)
 
 
@@ -85,29 +79,37 @@ class DownloadScreen : AppCompatActivity() {
                                 mViewModel.getVideo(streamLink,directory,binding.title.text.toString())
                             }
                         }
-                        is SimpleViewModel.Event.Downloading ->
+                        is SimpleViewModel.Event.Converting ->
                         {
-                            Toast.makeText(this@DownloadScreen,"Downloading",Toast.LENGTH_SHORT).show()
+                            binding.currentState.text="Converting..."
+                            binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_convert)
+                            binding.downloadProgress.setProgress(50,true)
+
                         }
                         is SimpleViewModel.Event.Saving ->
                         {
-                            Toast.makeText(this@DownloadScreen,"Saving",Toast.LENGTH_SHORT).show()
+                            binding.currentState.text="Saving..."
+                            binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_convert)
+                            binding.downloadProgress.setProgress(80,true)
                         }
                         is SimpleViewModel.Event.Success ->
                         {
                             withContext(Dispatchers.Main)
                             {
+                                binding.currentState.text="Success"
                                 binding.stateProgress.text=""
                                 val drawable1 = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.success)
                                 binding.stateProgress.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable1, null, null, null)
 
                                 binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_success)
                                 binding.downloadDescription.visibility= View.VISIBLE
+                                binding.downloadProgress.setProgress(100,true)
                                 binding.downloadDescription.text= event.result
                                 val drawable2 = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.success_icon)
                                 binding.downloadDescription.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable2, null, null, null)
 
                                 binding.DownloadAgain.visibility=View.VISIBLE
+
 
                             }
                         }
@@ -115,18 +117,19 @@ class DownloadScreen : AppCompatActivity() {
                         {
                             withContext(Dispatchers.Main)
                             {
+                                binding.currentState.text="Failed"
+                                binding.downloadProgress.setProgress(100,true)
                                 binding.stateProgress.text=""
                                 val drawable1 = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.failed)
                                 binding.stateProgress.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable1, null, null, null)
 
                                 binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_failed)
                                 binding.downloadDescription.visibility= View.VISIBLE
-                                binding.downloadDescription.text= event.error
+                                binding.downloadDescription.text= " "+event.error
                                 val drawable = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.fail_icon)
                                 binding.downloadDescription.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
 
                                 binding.DownloadAgain.visibility=View.VISIBLE
-
 
                             }
                         }
