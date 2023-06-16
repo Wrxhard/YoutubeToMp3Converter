@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">YoutubeToMp3Converter</string>
+    <string name="AppName">MP3 Downloader</string>
+    <string name="header_title_1">Youtube Link</string>
+    <string name="hint_link_input">Put the youtube link here</string>
+    <string name="content_desc_logo">Youtube Logo</string>
+    <string name="header_title_2">Destination Folder</string>
+</resources>

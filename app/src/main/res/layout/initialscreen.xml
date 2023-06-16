@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".screen.InitialScreen">
+    <ImageView
+        android:id="@+id/YoutubeLogo"
+        android:contentDescription="@string/content_desc_logo"
+
+        android:layout_width="@dimen/_24sdp"
+        android:layout_height="@dimen/_24sdp"
+        android:src="@drawable/youtube_logo_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/AppName"
+        app:layout_constraintBottom_toBottomOf="@id/AppName"
+        android:layout_marginStart="@dimen/_15sdp"
+        />
+    <TextView
+        android:id="@+id/AppName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/YoutubeLogo"
+        android:layout_marginTop="@dimen/_40sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:textSize="@dimen/_20ssp"
+        android:textStyle="bold"
+        android:text="@string/AppName"
+        />
+    <TextView
+        android:id="@+id/header_title_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/AppName"
+        app:layout_constraintStart_toStartOf="@id/YoutubeLogo"
+        android:layout_marginTop="@dimen/_18sdp"
+        android:textSize="@dimen/_14ssp"
+        android:textStyle="bold"
+        android:text="@string/header_title_1"
+        />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/LinkInputField"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_15sdp"
+        android:layout_marginEnd="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintStart_toStartOf="@id/YoutubeLogo"
+        app:layout_constraintTop_toBottomOf="@id/header_title_1"
+
+        app:startIconDrawable="@drawable/linkicon"
+        app:endIconMode="clear_text"
+        app:endIconDrawable="@drawable/close_icon"
+        app:endIconTint="#BDBDBD"
+        app:boxStrokeColor="@android:color/transparent"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/LinkToVideo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:importantForAccessibility="no"
+            android:inputType="textUri" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        android:id="@+id/header_title_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/LinkInputField"
+        app:layout_constraintStart_toStartOf="@id/YoutubeLogo"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:textSize="@dimen/_14ssp"
+        android:textStyle="bold"
+        android:text="@string/header_title_2"
+        />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/StoreDirectory"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_15sdp"
+        android:layout_marginEnd="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintStart_toStartOf="@id/YoutubeLogo"
+        app:layout_constraintTop_toBottomOf="@id/header_title_2"
+
+        app:startIconDrawable="@drawable/foldericon"
+        app:boxStrokeColor="@android:color/transparent"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/LinkToFolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:editable="false"
+            android:text="" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        android:id="@+id/store_description"
+
+        app:layout_constraintTop_toBottomOf="@id/StoreDirectory"
+        app:layout_constraintStart_toStartOf="@id/YoutubeLogo"
+        android:drawableLeft="@drawable/informationicon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="@dimen/_10sdp"
+        android:text=" Where you want to save the MP3"
+        />
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:layout_marginStart="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginEnd="@dimen/_15sdp"
+        app:layout_constraintTop_toBottomOf="@id/store_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/DownloadButton"
+            android:background="@drawable/bg_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/white"
+                android:indeterminateTintMode="src_atop"
+
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_text"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:visibility="gone"
+
+                >
+            </ProgressBar>
+            <TextView
+                android:id="@+id/btn_text"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textColor="@color/white"
+                android:text="Download"
+                android:textStyle="bold"
+                android:textSize="@dimen/_14ssp"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".screen.DownloadScreen">
+    <ImageView
+            android:id="@+id/YoutubeLogo"
+            android:contentDescription="@string/content_desc_logo"
+
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:src="@drawable/youtube_logo_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/AppName"
+            android:layout_marginStart="@dimen/_15sdp"
+            />
+    <TextView
+            android:id="@+id/AppName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/YoutubeLogo"
+            android:layout_marginTop="@dimen/_40sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:textSize="@dimen/_20ssp"
+            android:textStyle="bold"
+            android:text="@string/AppName"
+            />
+    <androidx.cardview.widget.CardView
+            android:id="@+id/videoView"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/AppName"
+            android:layout_marginTop="@dimen/_30sdp"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:layout_marginBottom="@dimen/_20sdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:background="@drawable/bg_btn"
+
+            >
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/imageView"
+
+                    android:padding="@dimen/_14sdp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:scaleType="fitXY"
+                    android:src="@drawable/holder"
+                    android:adjustViewBounds="true"
+                    />
+                <TextView
+                    android:id="@+id/title"
+
+                    app:layout_constraintTop_toBottomOf="@id/imageView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/_14sdp"
+                    android:paddingEnd="@dimen/_14sdp"
+
+
+                    android:textSize="@dimen/_14ssp"
+                    android:textStyle="bold|normal"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:text="Big Buck Bunny 60fps 4K - Official Blender Foundation Short Film…"
+                    />
+                <TextView
+                    android:id="@+id/view_count"
+
+                    app:layout_constraintTop_toBottomOf="@id/title"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_16sdp"
+                    android:layout_marginStart="@dimen/_14sdp"
+
+                    android:textSize="@dimen/_12ssp"
+                    android:textColor="#BDBDBD"
+                    android:text="  1.433B Views"
+                    app:drawableStartCompat="@drawable/view_icon">
+
+                </TextView>
+                <TextView
+                    android:id="@+id/like_count"
+
+                    app:layout_constraintTop_toBottomOf="@id/title"
+                    app:layout_constraintStart_toEndOf="@id/view_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_16sdp"
+                    android:layout_marginStart="@dimen/_26sdp"
+
+                    android:textSize="@dimen/_12ssp"
+                    android:textColor="#BDBDBD"
+                    android:text="  1.4B Likes"
+                    app:drawableStartCompat="@drawable/like_icon">
+
+                </TextView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
