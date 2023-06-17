@@ -82,6 +82,7 @@ class DownloadScreen : AppCompatActivity() {
                         is SimpleViewModel.Event.Converting ->
                         {
                             binding.currentState.text="Converting..."
+                            binding.stateProgress.text=""
                             binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_convert)
                             binding.downloadProgress.setProgress(50,true)
 
@@ -89,6 +90,7 @@ class DownloadScreen : AppCompatActivity() {
                         is SimpleViewModel.Event.Saving ->
                         {
                             binding.currentState.text="Saving..."
+                            binding.stateProgress.text=""
                             binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_convert)
                             binding.downloadProgress.setProgress(80,true)
                         }
@@ -104,7 +106,7 @@ class DownloadScreen : AppCompatActivity() {
                                 binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_success)
                                 binding.downloadDescription.visibility= View.VISIBLE
                                 binding.downloadProgress.setProgress(100,true)
-                                binding.downloadDescription.text= event.result
+                                binding.downloadDescription.text= " "+event.result
                                 val drawable2 = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.success_icon)
                                 binding.downloadDescription.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable2, null, null, null)
 

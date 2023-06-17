@@ -72,9 +72,6 @@ class InitialScreen : AppCompatActivity() {
         binding.LinkToFolder.setText(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
         binding.DownloadButton.setOnClickListener {
             mViewModel.startGrabbing()
-            val py = Python.getInstance()
-            val youtubeHelper = py.getModule("YoutubeVideoDownload")
-            val stringHelper = py.getModule("StringHelper")
             val videoUrl = binding.LinkToVideo.text.toString()
 
             try {
@@ -84,6 +81,12 @@ class InitialScreen : AppCompatActivity() {
                     {
                         repeatOnLifecycle(Lifecycle.State.CREATED)
                         {
+                            //Get Python Instance
+                            val py = Python.getInstance()
+                            //Call YoutubeVideoDownload.py
+                            val youtubeHelper = py.getModule("YoutubeVideoDownload")
+                            //Call StringHelper.py
+                            val stringHelper = py.getModule("StringHelper")
                             //Call get_video function from python (yt-dlp)
                             val raw = youtubeHelper.callAttr("get_video_info", videoUrl)
                             val jsonObject=JSONObject(raw.toString())

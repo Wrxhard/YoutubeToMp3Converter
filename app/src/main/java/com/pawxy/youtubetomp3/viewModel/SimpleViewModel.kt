@@ -117,7 +117,7 @@ class SimpleViewModel:ViewModel() {
 
                 withContext(Dispatchers.Main)
                 {
-                    if (_state.value is Event.Converting)
+                    if (_state.value is Event.Saving)
                     {
                         onSuccess("MP3 successfully saved into selected folder")
 
@@ -225,7 +225,6 @@ class SimpleViewModel:ViewModel() {
                         progression.value="${formatFileSize(totalByteRead.toInt())} / ${formatFileSize(video.contentLength.toInt())}"
                         val progress=totalByteRead*100/video.contentLength/3
                         progressBar.value=progress.toInt()
-                        Log.i("pro",progressBar.value.toString())
                     }
                 }
                 withContext(Dispatchers.IO) {
