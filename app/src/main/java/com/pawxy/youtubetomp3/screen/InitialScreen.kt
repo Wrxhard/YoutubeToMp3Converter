@@ -71,56 +71,64 @@ class InitialScreen : AppCompatActivity() {
         //Default directory is Download
         binding.LinkToFolder.setText(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
         binding.DownloadButton.setOnClickListener {
-            mViewModel.startGrabbing()
             val videoUrl = binding.LinkToVideo.text.toString()
 
-            try {
-                if (videoUrl!="")
-                {
-                    lifecycleScope.launch(Dispatchers.IO)
+            if (binding.LinkToVideo.isEnabled)
+            {
+                try {
+                    if (videoUrl.contains("https://youtu.be/"))
                     {
-                        repeatOnLifecycle(Lifecycle.State.CREATED)
+                        mViewModel.startGrabbing()
+                        lifecycleScope.launch(Dispatchers.IO)
                         {
-                            //Get Python Instance
-                            val py = Python.getInstance()
-                            //Call YoutubeVideoDownload.py
-                            val youtubeHelper = py.getModule("YoutubeVideoDownload")
-                            //Call StringHelper.py
-                            val stringHelper = py.getModule("StringHelper")
-                            //Call get_video function from python (yt-dlp)
-                            val raw = youtubeHelper.callAttr("get_video_info", videoUrl)
-                            val jsonObject=JSONObject(raw.toString())
-                            //Grab the first url that store video
-                            val videoOverview=filerJson(jsonObject).copy()
-                            //Remove all special character,emoji,icon and non english alphabet
-                            val title = stringHelper.callAttr("remove_special_characters",videoOverview.title).toString()
-                            withContext(Dispatchers.Main)
+                            repeatOnLifecycle(Lifecycle.State.CREATED)
                             {
-                                val intent = Intent(this@InitialScreen,DownloadScreen::class.java).apply {
-                                    videoOverview.let {
-                                        putExtra("title",title)
-                                        putExtra("thumbnail",videoOverview.thumbnail)
-                                        putExtra("stream_link",videoOverview.streamLink)
-                                        putExtra("view_count",videoOverview.view)
-                                        putExtra("like_count",videoOverview.like)
-                                        putExtra("directory",binding.LinkToFolder.text.toString())
-                                    }
+                                //Get Python Instance
+                                val py = Python.getInstance()
+                                //Call YoutubeVideoDownload.py
+                                val youtubeHelper = py.getModule("YoutubeVideoDownload")
+                                //Call StringHelper.py
+                                val stringHelper = py.getModule("StringHelper")
+                                //Call get_video function from python (yt-dlp)
+                                val raw = youtubeHelper.callAttr("get_video_info", videoUrl)
+                                val jsonObject=JSONObject(raw.toString())
+                                //Grab the first url that store video
+                                val videoOverview=filerJson(jsonObject).copy()
+                                //Remove all special character,emoji,icon and non english alphabet
+                                val title = stringHelper.callAttr("remove_special_characters",videoOverview.title).toString()
+                                withContext(Dispatchers.Main)
+                                {
+                                    val intent = Intent(this@InitialScreen,DownloadScreen::class.java).apply {
+                                        videoOverview.let {
+                                            putExtra("title",title)
+                                            putExtra("thumbnail",videoOverview.thumbnail)
+                                            putExtra("stream_link",videoOverview.streamLink)
+                                            putExtra("view_count",videoOverview.view)
+                                            putExtra("like_count",videoOverview.like)
+                                            putExtra("directory",binding.LinkToFolder.text.toString())
+                                        }
 
+                                    }
+                                    startActivity(intent)
                                 }
-                                startActivity(intent)
                             }
                         }
+
+
+                    }else{
+                        if (binding.LinkToVideo.isEnabled)
+                        {
+                            mViewModel.restart()
+                            Toast.makeText(this@InitialScreen,"Please Provide A Link To Video",Toast.LENGTH_SHORT).show()
+                        }
+
                     }
-
-
-                }else{
+                } catch (e: Exception) {
+                    Toast.makeText(this,"Failed to grab video info",Toast.LENGTH_SHORT).show()
                     mViewModel.restart()
-                    Toast.makeText(this@InitialScreen,"Please Provide A Link To Video",Toast.LENGTH_SHORT).show()
                 }
-            } catch (e: Exception) {
-                Toast.makeText(this,"Failed to grab video info",Toast.LENGTH_SHORT).show()
-                mViewModel.restart()
             }
+
 
         }
         binding.LinkToFolder.setOnClickListener {
@@ -161,7 +169,8 @@ class InitialScreen : AppCompatActivity() {
     }
     private fun disableUserInput()
     {
-        binding.btnText.text="Grabbing Info"
+        binding.btnText.text=" Grabbing Info..."
+        binding.guideline.setGuidelinePercent(0.365F)
         binding.progressBar.visibility=View.VISIBLE
         binding.DownloadButton.setBackgroundColor(Color.parseColor("#9D7CC8"))
         binding.LinkToVideo.isEnabled=false
@@ -172,6 +181,7 @@ class InitialScreen : AppCompatActivity() {
     private fun enableUserInput()
     {
         binding.btnText.text="Download"
+        binding.guideline.setGuidelinePercent(0.4F)
         binding.progressBar.visibility=View.GONE
         binding.DownloadButton.setBackgroundColor(Color.parseColor("#892EFF"))
         binding.LinkToVideo.isEnabled=true

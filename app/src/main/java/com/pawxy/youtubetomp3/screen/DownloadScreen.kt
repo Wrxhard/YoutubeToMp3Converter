@@ -120,19 +120,22 @@ class DownloadScreen : AppCompatActivity() {
                         {
                             withContext(Dispatchers.Main)
                             {
-                                binding.currentState.text="Failed"
-                                binding.downloadProgress.setProgress(100,true)
-                                binding.stateProgress.text=""
-                                val drawable1 = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.failed)
-                                binding.stateProgress.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable1, null, null, null)
+                                if (binding.currentState.text!="Failed")
+                                {
+                                    binding.currentState.text="Failed"
+                                    binding.downloadProgress.setProgress(100,true)
+                                    binding.stateProgress.text=""
+                                    val drawable1 = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.failed)
+                                    binding.stateProgress.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable1, null, null, null)
 
-                                binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_failed)
-                                binding.downloadDescription.visibility= View.VISIBLE
-                                binding.downloadDescription.text= " "+event.error
-                                val drawable = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.fail_icon)
-                                binding.downloadDescription.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
+                                    binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_failed)
+                                    binding.downloadDescription.visibility= View.VISIBLE
+                                    binding.downloadDescription.text= " "+event.error
+                                    val drawable = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.fail_icon)
+                                    binding.downloadDescription.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
 
-                                binding.DownloadAgain.visibility=View.VISIBLE
+                                    binding.DownloadAgain.visibility=View.VISIBLE
+                                }
 
                             }
                         }

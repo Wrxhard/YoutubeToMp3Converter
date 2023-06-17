@@ -103,23 +103,16 @@ class SimpleViewModel:ViewModel() {
             val video = async {
                 NetworkHelper.doNetworkCall(url)
             }.await()
-
             //After got the input stream save it to m4a file
             video?.let {
                 async {
                     saveToFile(it, directoryPath,title)
                 }.await()
-
                 //Check if any file name exist
                 val outputPath=getUniqueFileName("$directoryPath/$title.mp3")
-                withContext(Dispatchers.Main)
-                {
-                    converting()
-                }
-
                 //Start converting m4a to mp3
                 async(Dispatchers.IO) {
-                    convertM4AToMP3("$directoryPath/$title.m4a", outputPath,directoryPath)
+                    convertM4AToMP3("$directoryPath/$title.m4a", outputPath)
                 }.await()
 
                 withContext(Dispatchers.Main)
@@ -159,6 +152,7 @@ class SimpleViewModel:ViewModel() {
         return file.absolutePath
     }
 
+    //Format file size to byte
     fun formatFileSize(size: Int): String {
         val units = arrayOf("B", "KB", "MB", "GB", "TB")
         var fileSize = size.toDouble()
@@ -171,15 +165,20 @@ class SimpleViewModel:ViewModel() {
 
         return "%.2f".format(fileSize) + units[unitIndex]
     }
-    private fun convertM4AToMP3(inputPath: String, outputPath: String, directoryPath: String) {
+    //Convert m4a file to mp3
+    private fun convertM4AToMP3(inputPath: String, outputPath: String) {
         viewModelScope.launch {
+            withContext(Dispatchers.Main)
+            {
+                converting()
+            }
             val success = async {
                 convertM4AToMP3Internal(inputPath, outputPath)
             }.await()
             if (success) {
                 saving()
             } else {
-                onFailure("Failed to convert")
+                onFailure("Failure To Convert")
             }
         }
     }
@@ -198,7 +197,7 @@ class SimpleViewModel:ViewModel() {
             val result = FFmpeg.execute(command)
             result == RETURN_CODE_SUCCESS
         } catch (e: Exception) {
-            onFailure("Failed to convert")
+            onFailure("Failed To Convert")
             e.printStackTrace()
             false
         }
@@ -215,7 +214,7 @@ class SimpleViewModel:ViewModel() {
                 temp = withContext(Dispatchers.IO) {
                     FileOutputStream(tempFile)
                 }
-                val buffer = ByteArray(32 * 1024) // 32kb buffer
+                val buffer = ByteArray(16 * 1024) // 16kb buffer
                 var bytesRead: Int
                 while (withContext(Dispatchers.IO) {
                         video.inputStream.read(buffer)
@@ -241,7 +240,7 @@ class SimpleViewModel:ViewModel() {
                 e.printStackTrace()
                 withContext(Dispatchers.Main)
                 {
-                    onFailure("Please check your internet connection ")
+                    onFailure("Failed On Download Missing A Few Second At The End")
                 }
 
             } finally {
