@@ -110,13 +110,20 @@ class SimpleViewModel:ViewModel() {
                 }.await()
                 //Check if any file name exist
                 val outputPath=getUniqueFileName("$directoryPath/$title.mp3")
+
+                withContext(Dispatchers.Main)
+                {
+                    converting()
+                }
                 //Start converting m4a to mp3
-                async(Dispatchers.IO) {
-                    convertM4AToMP3("$directoryPath/$title.m4a", outputPath)
+                async {
+                    convertM4AToMP3Internal("$directoryPath/$title.m4a", outputPath)
                 }.await()
 
                 withContext(Dispatchers.Main)
                 {
+
+                    saving()
                     if (_state.value is Event.Saving)
                     {
                         onSuccess("MP3 successfully saved into selected folder")
@@ -166,23 +173,7 @@ class SimpleViewModel:ViewModel() {
         return "%.2f".format(fileSize) + units[unitIndex]
     }
     //Convert m4a file to mp3
-    private fun convertM4AToMP3(inputPath: String, outputPath: String) {
-        viewModelScope.launch {
-            withContext(Dispatchers.Main)
-            {
-                converting()
-            }
-            val success = async {
-                convertM4AToMP3Internal(inputPath, outputPath)
-            }.await()
-            if (success) {
-                saving()
-            } else {
-                onFailure("Failure To Convert")
-            }
-        }
-    }
-    private fun convertM4AToMP3Internal(inputPath: String, outputPath: String): Boolean {
+    private suspend fun convertM4AToMP3Internal(inputPath: String, outputPath: String): Boolean {
         return try {
             val command = arrayOf(
                 "-i", inputPath,
@@ -190,14 +181,18 @@ class SimpleViewModel:ViewModel() {
                 "-ignore_unknown",
                 "-sn",
                 "-c:a", "libmp3lame",
-                "-q:a", "2",
+                "-q:a", "6",
                 outputPath
             )
 
             val result = FFmpeg.execute(command)
             result == RETURN_CODE_SUCCESS
         } catch (e: Exception) {
-            onFailure("Failed To Convert")
+            withContext(Dispatchers.Main)
+            {
+                onFailure("Failed To Convert")
+
+            }
             e.printStackTrace()
             false
         }
@@ -214,7 +209,7 @@ class SimpleViewModel:ViewModel() {
                 temp = withContext(Dispatchers.IO) {
                     FileOutputStream(tempFile)
                 }
-                val buffer = ByteArray(16 * 1024) // 16kb buffer
+                val buffer = ByteArray(128 * 1024) // 128kb buffer
                 var bytesRead: Int
                 while (withContext(Dispatchers.IO) {
                         video.inputStream.read(buffer)
@@ -226,10 +221,11 @@ class SimpleViewModel:ViewModel() {
 
                     totalByteRead += bytesRead
 
+                    val progressionValue="${formatFileSize(totalByteRead.toInt())} / ${formatFileSize(video.contentLength.toInt())}"
+                    val progress=totalByteRead*100/video.contentLength/3
                     withContext(Dispatchers.Main)
                     {
-                        progression.value="${formatFileSize(totalByteRead.toInt())} / ${formatFileSize(video.contentLength.toInt())}"
-                        val progress=totalByteRead*100/video.contentLength/3
+                        progression.value=progressionValue
                         progressBar.value=progress.toInt()
                     }
                 }
