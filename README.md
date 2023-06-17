@@ -40,9 +40,3 @@ https://github.com/Wrxhard/YoutubeToMp3Converter/assets/91369021/71c6e4d3-a2ed-4
 ## Author
 - NguyenTrongPhuc
 
-## Acknowledgments
-- Chaquopy : [https://chaquo.com/chaquopy](#Chaquopy)
-- ffmpeg-kit : [https://github.com/arthenica/ffmpeg-kit](#ffmpeg)
-
-
-
