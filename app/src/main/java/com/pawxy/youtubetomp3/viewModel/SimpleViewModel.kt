@@ -10,6 +10,7 @@ import com.pawxy.youtubetomp3.model.Video
 import com.pawxy.youtubetomp3.network.NetworkHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -97,20 +98,26 @@ class SimpleViewModel:ViewModel() {
     fun getVideo(url:String,directoryPath: String,title:String)
     {
         viewModelScope.launch(Dispatchers.IO) {
+
+            //Use Okhttp to get input stream
             val video = async {
                 NetworkHelper.doNetworkCall(url)
             }.await()
+
+            //After got the input stream save it to m4a file
             video?.let {
                 async {
                     saveToFile(it, directoryPath,title)
                 }.await()
 
+                //Check if any file name exist
                 val outputPath=getUniqueFileName("$directoryPath/$title.mp3")
                 withContext(Dispatchers.Main)
                 {
                     converting()
                 }
 
+                //Start converting m4a to mp3
                 async(Dispatchers.IO) {
                     convertM4AToMP3("$directoryPath/$title.m4a", outputPath,directoryPath)
                 }.await()
@@ -120,9 +127,9 @@ class SimpleViewModel:ViewModel() {
                     if (_state.value is Event.Saving)
                     {
                         onSuccess("MP3 successfully saved into selected folder")
-
                     }
-                    clearTemp(directoryPath,title)
+                    //Delete m4a temp file used to convert
+                    clearTemp(directoryPath, title)
                 }
             }
         }
@@ -208,7 +215,7 @@ class SimpleViewModel:ViewModel() {
                 temp = withContext(Dispatchers.IO) {
                     FileOutputStream(tempFile)
                 }
-                val buffer = ByteArray(64 * 1024) // 64kb buffer
+                val buffer = ByteArray(32 * 1024) // 32kb buffer
                 var bytesRead: Int
                 while (withContext(Dispatchers.IO) {
                         video.inputStream.read(buffer)

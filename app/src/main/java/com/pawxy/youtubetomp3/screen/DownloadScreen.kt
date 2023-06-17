@@ -113,6 +113,7 @@ class DownloadScreen : AppCompatActivity() {
                                 binding.DownloadAgain.visibility=View.VISIBLE
 
 
+
                             }
                         }
                         is SimpleViewModel.Event.Failure ->
