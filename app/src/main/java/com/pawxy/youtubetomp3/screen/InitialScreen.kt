@@ -146,6 +146,7 @@ class InitialScreen : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         activityLauncher.launch(intent)
     }
+    //Check Event State
     private fun checkState()
     {
         lifecycleScope.launch {

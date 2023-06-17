@@ -152,7 +152,7 @@ class SimpleViewModel:ViewModel() {
         return file.absolutePath
     }
 
-    //Format file size to byte
+    //Format file size length to byte
     fun formatFileSize(size: Int): String {
         val units = arrayOf("B", "KB", "MB", "GB", "TB")
         var fileSize = size.toDouble()

@@ -47,8 +47,8 @@ class DownloadScreen : AppCompatActivity() {
                 .into(binding.imageView)
 
             binding.title.text = title
-            binding.likeCount.text = " $likeCount"
-            binding.viewCount.text = " $viewCount"
+            binding.likeCount.text = "  $likeCount"
+            binding.viewCount.text = "  $viewCount"
             binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_download)
 
 
