@@ -1,6 +1,4 @@
 # YoutubeToMp3Converter
-### This is an Android application capable of converting a shared YouTube video link into a complete MP3 file by embedding the yt-dlp library to extract video information.
-
 ## Table of contents
 * [General info](#General-info)
 * [Technologies](#Technologies)
@@ -11,7 +9,7 @@
 * [Acknowledgments](#Acknowledgments)
 
 ## General info
-### These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+### This is an Android application capable of converting a shared YouTube video link into a complete MP3 file by embedding the yt-dlp library to extract video information.
 ## Technologies
 - Kotlin
 - Android Studio
