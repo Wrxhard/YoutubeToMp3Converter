@@ -91,7 +91,7 @@ class DownloadScreen : AppCompatActivity() {
                         {
                             binding.currentState.text="Saving..."
                             binding.stateProgress.text=""
-                            binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_convert)
+                            binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_save)
                             binding.downloadProgress.setProgress(80,true)
                         }
                         is SimpleViewModel.Event.Success ->

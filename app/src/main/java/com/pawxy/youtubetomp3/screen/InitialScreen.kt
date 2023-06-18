@@ -76,7 +76,7 @@ class InitialScreen : AppCompatActivity() {
             if (binding.LinkToVideo.isEnabled)
             {
                 try {
-                    if (videoUrl.contains("https://youtu.be/"))
+                    if (videoUrl.contains("https://youtu"))
                     {
                         mViewModel.startGrabbing()
                         lifecycleScope.launch(Dispatchers.IO)

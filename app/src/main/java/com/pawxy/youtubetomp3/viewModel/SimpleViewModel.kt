@@ -1,6 +1,9 @@
 package com.pawxy.youtubetomp3.viewModel
 
+import android.content.Context
+import android.media.AudioManager
 import android.util.Log
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -107,23 +110,28 @@ class SimpleViewModel:ViewModel() {
             video?.let {
                 async {
                     saveToFile(it, directoryPath,title)
+                    withContext(Dispatchers.Main)
+                    {
+                        converting()
+                    }
+                    delay(1000)
                 }.await()
                 //Check if any file name exist
                 val outputPath=getUniqueFileName("$directoryPath/$title.mp3")
-
-                withContext(Dispatchers.Main)
-                {
-                    converting()
-                }
                 //Start converting m4a to mp3
                 async {
                     convertM4AToMP3Internal("$directoryPath/$title.m4a", outputPath)
+                    withContext(Dispatchers.Main)
+                    {
+                        saving()
+
+                    }
+                    delay(1000)
                 }.await()
 
                 withContext(Dispatchers.Main)
                 {
 
-                    saving()
                     if (_state.value is Event.Saving)
                     {
                         onSuccess("MP3 successfully saved into selected folder")
@@ -181,7 +189,7 @@ class SimpleViewModel:ViewModel() {
                 "-ignore_unknown",
                 "-sn",
                 "-c:a", "libmp3lame",
-                "-q:a", "6",
+                "-q:a", "0",
                 outputPath
             )
 
@@ -209,7 +217,7 @@ class SimpleViewModel:ViewModel() {
                 temp = withContext(Dispatchers.IO) {
                     FileOutputStream(tempFile)
                 }
-                val buffer = ByteArray(128 * 1024) // 128kb buffer
+                val buffer = ByteArray(32 * 1024) // 32kb buffer
                 var bytesRead: Int
                 while (withContext(Dispatchers.IO) {
                         video.inputStream.read(buffer)
