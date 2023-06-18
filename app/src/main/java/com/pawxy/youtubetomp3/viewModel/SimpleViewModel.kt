@@ -109,17 +109,16 @@ class SimpleViewModel:ViewModel() {
 
             //After got the input stream save it to m4a file
             video?.let {
-                async {
+                val outputPath = async {
                     saveToFile(it, directoryPath,title)
                     withContext(Dispatchers.Main)
                     {
                         converting()
                     }
                     delay(1000)
+                    getUniqueFileName("$directoryPath/$title.mp3")
                 }.await()
 
-                //Check if any file name exist
-                val outputPath=getUniqueFileName("$directoryPath/$title.mp3")
 
                 //Start converting m4a to mp3
                 async {
@@ -255,7 +254,7 @@ class SimpleViewModel:ViewModel() {
                 e.printStackTrace()
                 withContext(Dispatchers.Main)
                 {
-                    onFailure("Failed On Download Unstable Internet Connection")
+                    onFailure("Failed Fully Download Unstable Internet")
                 }
 
             } finally {

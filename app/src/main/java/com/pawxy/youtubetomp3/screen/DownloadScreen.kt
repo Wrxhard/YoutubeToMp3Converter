@@ -14,6 +14,7 @@ import com.pawxy.youtubetomp3.R
 import com.pawxy.youtubetomp3.viewModel.SimpleViewModel
 import com.pawxy.youtubetomp3.databinding.DownloadscreenBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -110,6 +111,7 @@ class DownloadScreen : AppCompatActivity() {
                                 val drawable2 = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.success_icon)
                                 binding.downloadDescription.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable2, null, null, null)
 
+                                delay(500)
                                 binding.DownloadAgain.visibility=View.VISIBLE
 
 
@@ -134,6 +136,7 @@ class DownloadScreen : AppCompatActivity() {
                                     val drawable = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.fail_icon)
                                     binding.downloadDescription.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
 
+                                    delay(500)
                                     binding.DownloadAgain.visibility=View.VISIBLE
                                 }
 
