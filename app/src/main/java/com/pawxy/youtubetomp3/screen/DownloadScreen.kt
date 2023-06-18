@@ -111,7 +111,7 @@ class DownloadScreen : AppCompatActivity() {
                                 val drawable2 = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.success_icon)
                                 binding.downloadDescription.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable2, null, null, null)
 
-                                delay(500)
+                                delay(1000)
                                 binding.DownloadAgain.visibility=View.VISIBLE
 
 
@@ -136,7 +136,7 @@ class DownloadScreen : AppCompatActivity() {
                                     val drawable = ContextCompat.getDrawable(this@DownloadScreen, R.drawable.fail_icon)
                                     binding.downloadDescription.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
 
-                                    delay(500)
+                                    delay(1000)
                                     binding.DownloadAgain.visibility=View.VISIBLE
                                 }
 

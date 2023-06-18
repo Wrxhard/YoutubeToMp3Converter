@@ -232,7 +232,6 @@ class InitialScreen : AppCompatActivity() {
             val streamLink=formats.getJSONObject(i).getString("url")
             if(streamLink.contains("googlevideo"))
             {
-                Log.i("steam",streamLink.takeLast(10))
                 return VideoOverview(title,thumbnail,streamLink,view, like)
             }
         }

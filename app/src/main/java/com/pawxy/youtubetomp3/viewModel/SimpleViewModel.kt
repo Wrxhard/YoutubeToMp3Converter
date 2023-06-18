@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -73,17 +74,23 @@ class SimpleViewModel:ViewModel() {
 
     private fun clearTemp(directoryPath: String,title: String)
     {
-        val file = File("$directoryPath/$title.m4a")
-        if (file.exists()) {
-            val deleted = file.delete()
-            if (deleted) {
-                Log.i("delete temp","Success")
+        try {
+            val file = File("$directoryPath/$title.m4a")
+            if (file.exists()) {
+                val deleted = file.delete()
+                if (deleted) {
+                    Log.i("delete temp","Success")
+                } else {
+                    Log.i("delete temp","Failed")
+                }
             } else {
-                Log.i("delete temp","Failed")
+                Log.i("delete temp","File not exist")
             }
-        } else {
-            Log.i("delete temp","File not exist")
+        }catch (e:java.lang.Exception)
+        {
+            e.printStackTrace()
         }
+
     }
     fun restart(){
         _state.value= Event.Empty
@@ -115,7 +122,7 @@ class SimpleViewModel:ViewModel() {
                     {
                         converting()
                     }
-                    delay(1000)
+                    delay(500)
                     getUniqueFileName("$directoryPath/$title.mp3")
                 }.await()
 
@@ -128,7 +135,7 @@ class SimpleViewModel:ViewModel() {
                         saving()
 
                     }
-                    delay(1000)
+                    delay(500)
                 }.await()
 
                 withContext(Dispatchers.Main)
@@ -210,61 +217,58 @@ class SimpleViewModel:ViewModel() {
     }
 
     //Save temp file to where user chosen
-    private suspend fun saveToFile(video: Video, directoryPath: String,fileName: String) {
-            var temp:OutputStream? = null
-            var totalByteRead:Long =0
+    private suspend fun saveToFile(video: Video, directoryPath: String, fileName: String) {
+        var temp: OutputStream? = null
+        var totalByteRead: Long = 0
 
-            try {
-                val directory = File(directoryPath)
+        try {
+            val directory = File(directoryPath)
 
-                //Create a temp m4a file
-                val tempFile= File(directory, "$fileName.m4a")
-                temp = withContext(Dispatchers.IO) {
-                    FileOutputStream(tempFile)
-                }
-                val buffer = ByteArray(32 * 1024) // 32kb buffer
-                var bytesRead: Int
-
-                //Open stream got from okhttp to read
-                while (withContext(Dispatchers.IO) {
-                        video.inputStream.read(buffer)
-                    }.also { bytesRead = it } != -1) {
-
-                    //Write into a temp file
-                    withContext(Dispatchers.IO) {
-                        temp.write(buffer, 0, bytesRead)
-                    }
-
-                    totalByteRead += bytesRead
-
-                    val progressionValue="${formatFileSize(totalByteRead.toInt())} / ${formatFileSize(video.contentLength.toInt())}"
-                    val progress=totalByteRead*100/video.contentLength/3
-                    withContext(Dispatchers.Main)
-                    {
-                        //update the progress value
-                        progression.value=progressionValue
-                        progressBar.value=progress.toInt()
-                    }
-                }
-
-                withContext(Dispatchers.IO) {
-                    temp.flush()
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                withContext(Dispatchers.Main)
-                {
-                    onFailure("Failed Fully Download Unstable Internet")
-                }
-
-            } finally {
-                withContext(Dispatchers.IO) {
-                    temp?.close()
-                }
-                withContext(Dispatchers.IO) {
-                    video.inputStream.close()
-                }
-
+            // Create a temp M4A file
+            val tempFile = File(directory, "$fileName.m4a")
+            temp = withContext(Dispatchers.IO) {
+                FileOutputStream(tempFile)
             }
+            val buffer = ByteArray(32 * 1024) // 32KB buffer
+            var bytesRead: Int
+
+            // Open stream got from OkHttp to read
+            val inputStream = BufferedInputStream(video.inputStream)
+
+            while (withContext(Dispatchers.IO) { inputStream.read(buffer) }.also { bytesRead = it } != -1) {
+
+                // Write into the temp file
+                withContext(Dispatchers.IO) {
+                    temp.write(buffer, 0, bytesRead)
+                }
+
+                totalByteRead += bytesRead
+
+                val progressionValue = "${formatFileSize(totalByteRead.toInt())} / ${formatFileSize(video.contentLength.toInt())}"
+                val progress = totalByteRead * 100 / video.contentLength / 3
+                withContext(Dispatchers.Main) {
+                    // Update the progress value
+                    progression.value = progressionValue
+                    progressBar.value = progress.toInt()
+                }
+            }
+
+            withContext(Dispatchers.IO) {
+                temp.flush()
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            withContext(Dispatchers.Main) {
+                onFailure("Failed Fully Download Unstable Internet")
+            }
+        } finally {
+            withContext(Dispatchers.IO) {
+                temp?.close()
+            }
+            withContext(Dispatchers.IO) {
+                video.inputStream.close()
+            }
+        }
     }
+
 }
