@@ -106,6 +106,7 @@ class SimpleViewModel:ViewModel() {
             val video = async {
                 NetworkHelper.doNetworkCall(url)
             }.await()
+
             //After got the input stream save it to m4a file
             video?.let {
                 async {
@@ -116,8 +117,10 @@ class SimpleViewModel:ViewModel() {
                     }
                     delay(1000)
                 }.await()
+
                 //Check if any file name exist
                 val outputPath=getUniqueFileName("$directoryPath/$title.mp3")
+
                 //Start converting m4a to mp3
                 async {
                     convertM4AToMP3Internal("$directoryPath/$title.m4a", outputPath)
@@ -180,6 +183,7 @@ class SimpleViewModel:ViewModel() {
 
         return "%.2f".format(fileSize) + units[unitIndex]
     }
+
     //Convert m4a file to mp3
     private suspend fun convertM4AToMP3Internal(inputPath: String, outputPath: String): Boolean {
         return try {
@@ -206,23 +210,28 @@ class SimpleViewModel:ViewModel() {
         }
     }
 
-    //Save file to where user chosen
+    //Save temp file to where user chosen
     private suspend fun saveToFile(video: Video, directoryPath: String,fileName: String) {
             var temp:OutputStream? = null
             var totalByteRead:Long =0
 
             try {
                 val directory = File(directoryPath)
+
+                //Create a temp m4a file
                 val tempFile= File(directory, "$fileName.m4a")
                 temp = withContext(Dispatchers.IO) {
                     FileOutputStream(tempFile)
                 }
                 val buffer = ByteArray(32 * 1024) // 32kb buffer
                 var bytesRead: Int
+
+                //Open stream got from okhttp to read
                 while (withContext(Dispatchers.IO) {
                         video.inputStream.read(buffer)
                     }.also { bytesRead = it } != -1) {
 
+                    //Write into a temp file
                     withContext(Dispatchers.IO) {
                         temp.write(buffer, 0, bytesRead)
                     }
@@ -233,10 +242,12 @@ class SimpleViewModel:ViewModel() {
                     val progress=totalByteRead*100/video.contentLength/3
                     withContext(Dispatchers.Main)
                     {
+                        //update the progress value
                         progression.value=progressionValue
                         progressBar.value=progress.toInt()
                     }
                 }
+
                 withContext(Dispatchers.IO) {
                     temp.flush()
                 }
@@ -244,7 +255,7 @@ class SimpleViewModel:ViewModel() {
                 e.printStackTrace()
                 withContext(Dispatchers.Main)
                 {
-                    onFailure("Failed On Download Missing A Few Second At The End")
+                    onFailure("Failed On Download Unstable Internet Connection")
                 }
 
             } finally {
