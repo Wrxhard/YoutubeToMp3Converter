@@ -8,7 +8,7 @@
 * [Acknowledgments](#Acknowledgments)
 
 ## General info
-### Unstable internet connection may affect the download process and make the file not fully download (still playable but not at full length) 
+### The download speed is very slow so the video may get corrupted before fully downloaded (exceeding Google's stream link expiration time). I will try to update and make it faster in the future
 ## Prerequisites
 - Android Studio
 - Kotlin
