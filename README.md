@@ -8,7 +8,7 @@
 * [Acknowledgments](#Acknowledgments)
 
 ## General info
-### The download speed is very slow so the video may get corrupted before fully downloaded (exceeding Google's stream link expiration time). I will try to update and make it faster in the future
+### The download speed is very slow so the video may get corrupted before fully downloaded (exceeding google's stream link expiration time I think). I will try to update and make it faster in the future
 ## Prerequisites
 - Android Studio
 - Kotlin
