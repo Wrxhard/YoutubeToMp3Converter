@@ -8,7 +8,7 @@
 * [Acknowledgments](#Acknowledgments)
 
 ## General info
-### The download speed is very slow so the video may get corrupted before fully downloaded (exceeding google's stream link expiration time I think). I will try to update and make it faster in the future
+### Unstable internet connection can cause the audio file not fully download 
 ## Prerequisites
 - Android Studio
 - Kotlin
