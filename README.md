@@ -8,8 +8,7 @@
 * [Acknowledgments](#Acknowledgments)
 
 ## General info
-### This is an Android application capable of converting a shared YouTube video link into a complete MP3 file by embedding the yt-dlp library to extract video information.
-
+### Unstable internet connection can cause the audio file not fully download 
 ## Prerequisites
 - Android Studio
 - Kotlin
