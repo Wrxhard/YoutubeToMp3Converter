@@ -90,26 +90,35 @@ class InitialScreen : AppCompatActivity() {
                                 //Call StringHelper.py
                                 val stringHelper = py.getModule("StringHelper")
                                 //Call get_video function from python (yt-dlp)
-                                val raw = youtubeHelper.callAttr("get_video_info", videoUrl)
+                                val raw = youtubeHelper.callAttr("get_audio",videoUrl)
                                 val jsonObject=JSONObject(raw.toString())
                                 //Grab the first url that store video
                                 val videoOverview=filerJson(jsonObject).copy()
                                 //Remove all special character,emoji,icon and non english alphabet
                                 val title = stringHelper.callAttr("remove_special_characters",videoOverview.title).toString()
-                                withContext(Dispatchers.Main)
+                                if (videoOverview.streamLink!="")
                                 {
-                                    val intent = Intent(this@InitialScreen,DownloadScreen::class.java).apply {
-                                        videoOverview.let {
-                                            putExtra("title",title)
-                                            putExtra("thumbnail",videoOverview.thumbnail)
-                                            putExtra("stream_link",videoOverview.streamLink)
-                                            putExtra("view_count",videoOverview.view)
-                                            putExtra("like_count",videoOverview.like)
-                                            putExtra("directory",binding.LinkToFolder.text.toString())
-                                        }
+                                    withContext(Dispatchers.Main)
+                                    {
+                                        val intent = Intent(this@InitialScreen,DownloadScreen::class.java).apply {
+                                            videoOverview.let {
+                                                putExtra("title",title)
+                                                putExtra("thumbnail",videoOverview.thumbnail)
+                                                putExtra("stream_link",videoOverview.streamLink)
+                                                putExtra("view_count",videoOverview.view)
+                                                putExtra("like_count",videoOverview.like)
+                                                putExtra("directory",binding.LinkToFolder.text.toString())
+                                            }
 
+                                        }
+                                        startActivity(intent)
                                     }
-                                    startActivity(intent)
+                                }else{
+                                    withContext(Dispatchers.Main)
+                                    {
+                                        Toast.makeText(this@InitialScreen,"Failed to grab video info",Toast.LENGTH_SHORT).show()
+                                        mViewModel.restart()
+                                    }
                                 }
                             }
                         }
@@ -230,9 +239,14 @@ class InitialScreen : AppCompatActivity() {
         for (i in 0 until formats.length())
         {
             val streamLink=formats.getJSONObject(i).getString("url")
-            if(streamLink.contains("googlevideo"))
+            if(formats.getJSONObject(i).has("ext"))
             {
-                return VideoOverview(title,thumbnail,streamLink,view, like)
+                val ext=formats.getJSONObject(i).getString("ext")
+                if (ext=="m4a")
+                {
+                    Log.i("m4a",streamLink)
+                    return VideoOverview(title,thumbnail,streamLink,view, like)
+                }
             }
         }
         return VideoOverview(title,thumbnail,"",view, like)

@@ -1,9 +1,6 @@
 package com.pawxy.youtubetomp3.viewModel
 
-import android.content.Context
-import android.media.AudioManager
 import android.util.Log
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -229,7 +226,7 @@ class SimpleViewModel:ViewModel() {
             temp = withContext(Dispatchers.IO) {
                 FileOutputStream(tempFile)
             }
-            val buffer = ByteArray(32 * 1024) // 32KB buffer
+            val buffer = ByteArray(8*1024) // 1KB buffer
             var bytesRead: Int
 
             // Open stream got from OkHttp to read
@@ -247,9 +244,9 @@ class SimpleViewModel:ViewModel() {
                 val progressionValue = "${formatFileSize(totalByteRead.toInt())} / ${formatFileSize(video.contentLength.toInt())}"
                 val progress = totalByteRead * 100 / video.contentLength / 3
                 withContext(Dispatchers.Main) {
-                    // Update the progress value
-                    progression.value = progressionValue
-                    progressBar.value = progress.toInt()
+                        // Update the values
+                        progression.value = progressionValue
+                        progressBar.value = progress.toInt()
                 }
             }
 
@@ -259,7 +256,7 @@ class SimpleViewModel:ViewModel() {
         } catch (e: IOException) {
             e.printStackTrace()
             withContext(Dispatchers.Main) {
-                onFailure("Failed Fully Download Unstable Internet")
+                onFailure("Failed Fully Download Unstable Connection")
             }
         } finally {
             withContext(Dispatchers.IO) {

@@ -74,6 +74,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
     //ffmpeg
     implementation 'com.arthenica:mobile-ffmpeg-full:4.4'
+    // debugImplementation because LeakCanary should only run in debug builds.
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.11'
 
 
 
