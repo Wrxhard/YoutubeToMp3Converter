@@ -108,6 +108,7 @@ class InitialScreen : AppCompatActivity() {
                                                 putExtra("view_count",videoOverview.view)
                                                 putExtra("like_count",videoOverview.like)
                                                 putExtra("directory",binding.LinkToFolder.text.toString())
+                                                putExtra("duration",videoOverview.duration)
                                             }
 
                                         }
@@ -232,6 +233,7 @@ class InitialScreen : AppCompatActivity() {
         val title = data.getString("title")
         val view = data.getString("view_count")
         val like = data.getString("like_count")
+        val duration = data.getInt("duration")
         val formats = data.getJSONArray("formats")
         val thumbnail = data.getJSONArray("thumbnails").getJSONObject(0).getString("url")
         thumbnail.replace("""\/""".toRegex(),"/")
@@ -245,11 +247,11 @@ class InitialScreen : AppCompatActivity() {
                 if (ext=="m4a")
                 {
                     Log.i("m4a",streamLink)
-                    return VideoOverview(title,thumbnail,streamLink,view, like)
+                    return VideoOverview(title,thumbnail,streamLink,view, like, duration)
                 }
             }
         }
-        return VideoOverview(title,thumbnail,"",view, like)
+        return VideoOverview(title,thumbnail,"",view, like, duration)
 
     }
 }

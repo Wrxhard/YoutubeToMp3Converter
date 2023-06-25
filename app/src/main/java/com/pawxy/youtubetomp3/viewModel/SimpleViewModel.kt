@@ -4,8 +4,11 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arthenica.mobileffmpeg.Config
+import com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL
 import com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS
 import com.arthenica.mobileffmpeg.FFmpeg
+import com.arthenica.mobileffmpeg.FFprobe
 import com.pawxy.youtubetomp3.model.Video
 import com.pawxy.youtubetomp3.network.NetworkHelper
 import kotlinx.coroutines.Dispatchers
@@ -102,7 +105,7 @@ class SimpleViewModel:ViewModel() {
     }
 
     //get the audio file from url (yt-dlp)
-    fun getVideo(url:String,directoryPath: String,title:String)
+    fun getVideo(url:String,directoryPath: String,title:String,duration:Int)
     {
         viewModelScope.launch(Dispatchers.IO) {
 
@@ -115,25 +118,22 @@ class SimpleViewModel:ViewModel() {
             video?.let {
                 val outputPath = async {
                     saveToFile(it, directoryPath,title)
-                    withContext(Dispatchers.Main)
-                    {
-                        converting()
-                    }
-                    delay(500)
                     getUniqueFileName("$directoryPath/$title.mp3")
                 }.await()
 
-
                 //Start converting m4a to mp3
                 async {
-                    convertM4AToMP3Internal("$directoryPath/$title.m4a", outputPath)
-                    withContext(Dispatchers.Main)
-                    {
-                        saving()
-
-                    }
-                    delay(500)
+                    convertM4AToMP3Internal("$directoryPath/$title.m4a", outputPath, duration)
                 }.await()
+                withContext(Dispatchers.Main)
+                {
+                    converting()
+                    delay(5000)
+                }
+                withContext(Dispatchers.Main)
+                {
+                    saving()
+                }
 
                 withContext(Dispatchers.Main)
                 {
@@ -188,8 +188,8 @@ class SimpleViewModel:ViewModel() {
     }
 
     //Convert m4a file to mp3
-    private suspend fun convertM4AToMP3Internal(inputPath: String, outputPath: String): Boolean {
-        return try {
+    private suspend fun convertM4AToMP3Internal(inputPath: String, outputPath: String, duration: Int) {
+        try {
             val command = arrayOf(
                 "-i", inputPath,
                 "-dn",
@@ -199,9 +199,73 @@ class SimpleViewModel:ViewModel() {
                 "-q:a", "0",
                 outputPath
             )
+            val info = FFprobe.getMediaInformation(inputPath)
+            Log.i("all prob",info.allProperties.toString())
 
-            val result = FFmpeg.execute(command)
-            result == RETURN_CODE_SUCCESS
+            Config.enableStatisticsCallback { newStatistics ->
+                val progress = newStatistics.time.toString()
+                val progressFinal = progress
+                Log.d("process", "Video Length: ${info.duration.length}")
+                Log.d(
+                    "frame",
+                    String.format(
+                        "frame: %d, time: %d",
+                        newStatistics.videoFrameNumber,
+                        newStatistics.time
+                    )
+                )
+                Log.d(
+                    "quality",
+                    String.format(
+                        "Quality: %f, time: %f",
+                        newStatistics.videoQuality,
+                        newStatistics.videoFps
+                    )
+                )
+                viewModelScope.launch {
+                    withContext(Dispatchers.Main){
+                        progression.value=progressFinal
+                    }
+                }
+            }
+
+
+            FFmpeg.executeAsync(command) { executionId, returnCode ->
+                if (returnCode === RETURN_CODE_SUCCESS) {
+                    Log.i(
+                        Config.TAG,
+                        "Async command execution completed successfully."
+                    )
+                } else if (returnCode === RETURN_CODE_CANCEL) {
+                    Log.i(
+                        Config.TAG,
+                        "Async command execution cancelled by user."
+                    )
+                } else {
+                    Log.i(
+                        Config.TAG,
+                        java.lang.String.format(
+                            "Async command execution failed with rc=%d.",
+                            returnCode
+                        )
+                    )
+                }
+            }
+            /*val ffmpegExecutions = FFmpeg.listExecutions()
+            Log.i("excution",ffmpegExecutions.indices.toString())
+            for (i in ffmpegExecutions.indices) {
+                val execution = ffmpegExecutions[i]
+                Log.d(
+                    "process",
+                    String.format(
+                        "Execution %d = id:%d, startTime:%s, command:%s.",
+                        i,
+                        execution.executionId,
+                        execution.startTime,
+                        execution.command
+                    )
+                )
+            }*/
         } catch (e: Exception) {
             withContext(Dispatchers.Main)
             {
@@ -209,7 +273,6 @@ class SimpleViewModel:ViewModel() {
 
             }
             e.printStackTrace()
-            false
         }
     }
 

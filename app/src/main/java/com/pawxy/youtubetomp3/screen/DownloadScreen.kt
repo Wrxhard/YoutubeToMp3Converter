@@ -75,13 +75,15 @@ class DownloadScreen : AppCompatActivity() {
                         is SimpleViewModel.Event.StartDownload -> {
                             val streamLink = intent.getStringExtra("stream_link")
                             val directory = intent.getStringExtra("directory")
+                            val duration = intent.getIntExtra("duration",0)
                             if (streamLink!= null  && directory!=null)
                             {
-                                mViewModel.getVideo(streamLink,directory,binding.title.text.toString())
+                                mViewModel.getVideo(streamLink,directory,binding.title.text.toString(),duration)
                             }
                         }
                         is SimpleViewModel.Event.Converting ->
                         {
+
                             binding.currentState.text="Converting..."
                             binding.stateProgress.text=""
                             binding.downloadProgress.progressDrawable=ContextCompat.getDrawable(this@DownloadScreen,R.drawable.progress_bar_convert)
