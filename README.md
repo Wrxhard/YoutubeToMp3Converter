@@ -8,7 +8,7 @@
 * [Acknowledgments](#Acknowledgments)
 
 ## General info
-### Currently still update and maintain (unstable internet connection can cause the audio file not fully download) 
+### Currently still in update and maintenance (unstable internet connection can cause the audio file not fully download) 
 ## Prerequisites
 - Android Studio
 - Kotlin
