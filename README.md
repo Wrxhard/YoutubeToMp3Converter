@@ -12,7 +12,7 @@
 ## Prerequisites
 - Android Studio
 - Kotlin
-- Python
+- Python (3.8)
 
 ## Library
 - Chaquopy
