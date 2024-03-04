@@ -15,7 +15,7 @@ object NetworkHelper {
         fileUrl: String,
     ): Video? = suspendCoroutine { continuation ->
         val client = OkHttpClient.Builder()
-            .readTimeout(0, TimeUnit.SECONDS) // Increase the read timeout as needed
+            .readTimeout(10000, TimeUnit.SECONDS) // Increase the read timeout as needed
             .build()
         val request = Request.Builder()
             .url(fileUrl)
